@@ -76,13 +76,13 @@
 
             if (all_tasks[current_task_index]) {
                 const task = all_tasks[current_task_index]
-                const sample_task = {
-                    "completed": true,
-                    "content": "My task",
-                    "id": 1234,
-                    "indent": 1,
-                    "priority": 1,
-                }
+                //{
+                //    "completed": true,
+                //    "content": "My task",
+                //    "id": 1234,
+                //    "indent": 1,
+                //    "priority": 1,
+                //}
                 document.getElementById("task_number_container").innerText = "" + (current_task_index + 1)
                 document.getElementById("task_title_container").innerText = task.content
                 document.getElementById("task_priority_container").innerText = "" + task.priority
