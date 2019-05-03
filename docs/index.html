@@ -1,0 +1,116 @@
+<!doctype html>
+<head>
+    <title>Prioritist</title>
+    <meta charset="utf-8"/>
+    <script type="text/javascript">
+        const API = "https://beta.todoist.com/API/v8"
+        let token = null
+        let all_tasks = null
+        let current_task_index = -1
+
+        function save_token() {
+            token = document.getElementById("token_field").value
+            console.log("token", token)
+        }
+
+        function personal_token() {
+            return token
+        }
+
+        function load_tasks() {
+            fetch(API + "/tasks", {
+                headers: {
+                    "Authorization": "Bearer " + personal_token()
+                }
+            }).then(function(response) {
+                console.log("load tasks response", response)
+                if (response.ok) {
+                    response.json().then(function(tasks) {
+                        all_tasks = tasks
+                        next_task()
+                    })
+                } else {
+                    console.log("load tasks error")
+                }
+            })
+        }
+
+        function current_task_id() {
+            return all_tasks[current_task_index].id
+        }
+
+        function current_task_priority() {
+            return all_tasks[current_task_index].priority
+        }
+
+        //TODO: You can make a total of 50 requests per minute per user when using the REST API.
+        //TODO: 15 seconds timeout
+        function set_priority(priority) {
+            if (priority == current_task_priority()) {
+                next_task()
+            } else {
+                console.log('set priority', priority)
+                document.getElementById("task_priority_container").innerText = "" + priority
+                fetch(API + "/tasks/" + current_task_id(), {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + personal_token(),
+                        "Content-Type": "application/json",
+                        "X-Request-Id": Math.random()
+                    },
+                    body: JSON.stringify({priority: priority})
+                }).then(function(response) {
+                    console.log('set priority response', response)
+                    if (response.ok) {
+                        next_task()
+                    } else {
+                        console.log("set priority error")
+                    }
+                })
+            }
+        }
+
+        function next_task() {
+            current_task_index += 1
+
+            if (all_tasks[current_task_index]) {
+                const task = all_tasks[current_task_index]
+                const sample_task = {
+                    "completed": true,
+                    "content": "My task",
+                    "id": 1234,
+                    "indent": 1,
+                    "priority": 1,
+                }
+                document.getElementById("task_title_container").innerText = task.content
+                document.getElementById("task_priority_container").innerText = "" + task.priority
+            }
+        }
+    </script>
+
+    <style type="text/css">
+    #task_title_container,
+    #task_priority_container
+    {
+        font-size: larger;
+        font-weight: bold;
+    }
+    </style>
+</head>
+<body>
+    <center>
+        Copy your Todoist personal API token from the <a href="https://todoist.com/prefs/integrations" target="_blank">Integrations</a> page and paste it into the input field:
+        <input id="token_field" type="text" name="token" onchange="save_token()"/> <button onclick="load_tasks()">OK</button>
+
+        <p id="task_title_container">Task title</p>
+        <p id="task_priority_container">0</p>
+        <p>
+            <button onclick="set_priority(1)">1</button>
+            <button onclick="set_priority(2)">2</button>
+            <button onclick="set_priority(3)">3</button>
+            <button onclick="set_priority(4)">4</button>
+        </p>
+
+        <p>This app is not created by, affiliated with, or supported by Doist.</p>
+    </center>
+</body>
