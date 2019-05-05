@@ -1,0 +1,177 @@
+#!/usr/bin/env ruby
+# vi: ft=ruby
+
+require 'bundler/inline'
+
+gemfile do
+  source "https://rubygems.org"
+  gem "colorize"
+  gem "http"
+  gem "ruby-limiter", require: "limiter"
+end
+
+require "logger"
+require "securerandom"
+
+module Prioritist
+  class Client
+    class ApiError < HTTP::ResponseError
+      def initialize(response)
+        super(response.body)
+      end
+    end
+
+    extend Limiter::Mixin
+
+    API = "https://beta.todoist.com/API/v8"
+    API_RATE = 50
+
+    def initialize(token, logger = Logger.new("/dev/null"))
+      @token = token
+      @logger = logger
+    end
+
+    def get(api_method, query = {})
+      api_call(:get, api_method, {}, {params: query})
+    end
+
+    def post(api_method, body = nil)
+      api_call(:post, api_method, {"content-type" => "application/json"}, {json: body})
+    end
+
+    private
+
+    def client
+      HTTP
+        .use(logging: {logger: @logger})
+        .auth("Bearer #{@token}")
+        .headers("x-request-id" => SecureRandom.hex)
+    end
+
+    def api_call(http_method, api_method, headers, args)
+      path = File.join(API, api_method)
+      response = client.headers(headers).send(http_method, path, args)
+      if response.status.success?
+        if response.mime_type
+          response.parse
+        else
+          nil
+        end
+      else
+        raise ApiError.new(response)
+      end
+    end
+    limit_method :api_call, rate: API_RATE
+  end
+
+  class TaskFetcher
+    def initialize(client)
+      @client = client
+    end
+
+    def tasks
+      tasks = @client.get("/tasks")
+      tasks.map{|task_data| Task.new(task_data)}
+    rescue HTTP::ResponseError => e
+      puts "Failed to fetch tasks: #{e.inspect}"
+      []
+    end
+  end
+
+  class Task
+    def initialize(task_data)
+      @data = task_data
+    end
+
+    def title
+      @data["content"]
+    end
+
+    def id
+      @data["id"]
+    end
+
+    def priority
+      @data["priority"]
+    end
+  end
+
+  class Priority
+    PRIORITIES = [1, 2, 3, 4].freeze
+
+    def initialize(value)
+      priority = value.to_i
+      if PRIORITIES.include?(priority)
+        @priority = priority
+      else
+        @priority = nil
+      end
+    end
+
+    def valid?
+      not @priority.nil?
+    end
+
+    def with_valid
+      yield(@priority) if valid?
+    end
+  end
+
+  class PriorityReader
+    def get(task)
+      puts "#{task.title.colorize(mode: :bold)}"
+      print "Priority: "
+      priority = Priority.new(gets)
+    end
+  end
+
+  class PriorityUpdater
+    def initialize(client)
+      @client = client
+    end
+
+    def update(task, priority)
+      if !priority.valid?
+        puts "Priority for task #{task.id} is invalid, skipping"
+      else
+        priority.with_valid do |priority_value|
+          do_update(task, priority_value)
+        end
+      end
+    end
+
+    private
+
+    def do_update(task, priority_value)
+      if task.priority == priority_value
+        puts "Priority did not change"
+        return
+      end
+      puts "Setting priority for task #{task.id}..."
+      @client.post("/tasks/#{task.id}", {priority: priority_value})
+      puts "Success"
+    rescue HTTP::ResponseError => e
+      puts "Failed, #{e.to_s}"
+    end
+  end
+end
+
+token = ENV["TODOIST_API_TOKEN"]
+
+if token.nil?
+  abort "Todoist API token expected in TODOIST_API_TOKEN environment variable. See https://todoist.com/prefs/integrations for details."
+end
+
+client = Prioritist::Client.new(token)
+fetcher = Prioritist::TaskFetcher.new(client)
+updater = Prioritist::PriorityUpdater.new(client)
+priority_reader = Prioritist::PriorityReader.new()
+
+
+fetcher.tasks.each do |task|
+  puts "==="
+  priority = priority_reader.get(task)
+  updater.update(task, priority)
+  puts
+end
+
