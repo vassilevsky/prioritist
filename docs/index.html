@@ -17,6 +17,10 @@
             return token
         }
 
+        function by_priority(task1, task2) {
+          return task2.priority - task1.priority
+        }
+
         function load_tasks() {
             fetch(API + "/tasks", {
                 headers: {
@@ -26,7 +30,7 @@
                 console.log("load tasks response", response)
                 if (response.ok) {
                     response.json().then(function(tasks) {
-                        all_tasks = tasks
+                        all_tasks = tasks.sort(by_priority)
                         document.getElementById("total_tasks_count_container").innerText = "" + tasks.length
                         next_task()
                     })
