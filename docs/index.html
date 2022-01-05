@@ -129,6 +129,14 @@
     </script>
 
     <style type="text/css">
+        #token_form
+        {
+            margin-bottom: 60px;
+        }
+        #disclaimer
+        {
+            margin-top: 60px;
+        }
         #task_title_container,
         #task_priority_container
         {
@@ -139,9 +147,10 @@
 </head>
 <body>
     <center>
-        Copy your Todoist personal API token from the <a href="https://todoist.com/prefs/integrations" target="_blank">Integrations</a> page and paste it into the input field:
-        <input id="token_field" type="text" name="token" onchange="save_token()"/> <button onclick="load_tasks()">OK</button>
-
+        <p id="token_form">
+            Copy your Todoist personal API token from the <a href="https://todoist.com/prefs/integrations" target="_blank">Integrations</a> page and paste it into the input field:
+            <input id="token_field" type="text" name="token" onchange="save_token()"/> <button onclick="load_tasks()">OK</button>
+        </p>
         <p><span id="task_number_container">0</span> / <span id="total_tasks_count_container">0</span></p>
         <p id="task_title_container">Task title</p>
         <p id="task_priority_container">0</p>
@@ -155,6 +164,6 @@
             <button onclick="mark_as_done()">✔</button>
             <button onclick="remove()">✘</button>
         </p>
-        <p>This app is not created by, affiliated with, or supported by Doist.</p>
+        <p id="disclaimer">This app is not created by, affiliated with, or supported by Doist.</p>
     </center>
 </body>
