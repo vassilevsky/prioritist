@@ -148,8 +148,9 @@
 <body>
     <center>
         <p id="token_form">
-            Copy your Todoist personal API token from the <a href="https://todoist.com/prefs/integrations" target="_blank">Integrations</a> page and paste it into the input field:
+            Copy API token at the bottom of <a href="https://todoist.com/prefs/integrations" target="_blank">Integrations</a> page and paste it here:
             <input id="token_field" type="text" name="token" onchange="save_token()"/> <button onclick="load_tasks()">OK</button>
+            It is sent nowhere but Todoist servers.
         </p>
         <p><span id="task_number_container">0</span> / <span id="total_tasks_count_container">0</span></p>
         <p id="task_title_container">Task title</p>
