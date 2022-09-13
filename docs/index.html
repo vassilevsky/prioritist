@@ -8,10 +8,6 @@
         let all_tasks = null
         let current_task_index = -1
 
-        function by_priority(task1, task2) {
-          return task2.priority - task1.priority
-        }
-
         function load_tasks() {
             token = document.getElementById("token_field").value
             fetch(API + "/tasks", {
@@ -38,6 +34,10 @@
 
         function current_task_priority() {
             return all_tasks[current_task_index].priority
+        }
+
+        function by_priority(task1, task2) {
+          return task2.priority - task1.priority
         }
 
         //TODO: You can make a total of 50 requests per minute per user when using the REST API.
