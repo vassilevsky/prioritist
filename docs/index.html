@@ -6,6 +6,7 @@
         const API = "https://api.todoist.com/rest/v1"
         let token = null
         let all_tasks = null
+        let total_count = null
         let current_task_index = -1
 
         function load_tasks() {
@@ -18,7 +19,8 @@
                 console.log("load tasks response", response)
                 if (response.ok) {
                     response.json().then(function(tasks) {
-                        setTotalTaskCount(tasks.length)
+                        total_count = tasks.length
+                        setTotalTaskCount(total_count)
                         all_tasks = tasks.sort(by_priority)
                         next_task()
                     })
@@ -81,6 +83,8 @@
             }).then(function(response) {
                 console.log('close response', response)
                 if (response.ok) {
+                    total_count -= 1
+                    setTotalTaskCount(total_count)
                     next_task()
                 } else {
                     console.log("close error")
@@ -98,6 +102,8 @@
             }).then(function(response) {
                 console.log('delete response', response)
                 if (response.ok) {
+                    total_count -= 1
+                    setTotalTaskCount(total_count)
                     next_task()
                 } else {
                     console.log("delete error")
