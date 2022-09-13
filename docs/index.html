@@ -8,11 +8,6 @@
         let all_tasks = null
         let current_task_index = -1
 
-        function save_token() {
-            token = document.getElementById("token_field").value
-            console.log("token", token)
-        }
-
         function personal_token() {
             return token
         }
@@ -22,6 +17,7 @@
         }
 
         function load_tasks() {
+            token = document.getElementById("token_field").value
             fetch(API + "/tasks", {
                 headers: {
                     "Authorization": "Bearer " + personal_token()
@@ -149,7 +145,8 @@
     <center>
         <p id="token_form">
             Copy API token at the bottom of <a href="https://todoist.com/prefs/integrations" target="_blank">Integrations</a> page and paste it here:
-            <input id="token_field" type="text" name="token" onchange="save_token()"/> <button onclick="load_tasks()">OK</button>
+            <input id="token_field" type="text" name="token"/>
+            <button onclick="load_tasks()">OK</button>
             It is sent nowhere but Todoist servers.
         </p>
         <p><span id="task_number_container">0</span> / <span id="total_tasks_count_container">0</span></p>
