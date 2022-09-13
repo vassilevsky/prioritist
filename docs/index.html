@@ -8,10 +8,6 @@
         let all_tasks = null
         let current_task_index = -1
 
-        function personal_token() {
-            return token
-        }
-
         function by_priority(task1, task2) {
           return task2.priority - task1.priority
         }
@@ -20,7 +16,7 @@
             token = document.getElementById("token_field").value
             fetch(API + "/tasks", {
                 headers: {
-                    "Authorization": "Bearer " + personal_token()
+                    "Authorization": "Bearer " + token
                 }
             }).then(function(response) {
                 console.log("load tasks response", response)
@@ -55,7 +51,7 @@
                 fetch(API + "/tasks/" + current_task_id(), {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer " + personal_token(),
+                        "Authorization": "Bearer " + token,
                         "Content-Type": "application/json",
                         "X-Request-Id": Math.random()
                     },
@@ -75,7 +71,7 @@
             fetch(API + "/tasks/" + current_task_id() + "/close", {
                 method: "POST",
                 headers: {
-                    "Authorization": "Bearer " + personal_token(),
+                    "Authorization": "Bearer " + token,
                     "X-Request-Id": Math.random()
                 }
             }).then(function(response) {
@@ -92,7 +88,7 @@
             fetch(API + "/tasks/" + current_task_id(), {
                 method: "DELETE",
                 headers: {
-                    "Authorization": "Bearer " + personal_token(),
+                    "Authorization": "Bearer " + token,
                     "X-Request-Id": Math.random()
                 }
             }).then(function(response) {
