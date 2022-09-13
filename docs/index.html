@@ -16,7 +16,6 @@
                     "Authorization": "Bearer " + token
                 }
             }).then(function(response) {
-                console.log("load tasks response", response)
                 if (response.ok) {
                     response.json().then(function(tasks) {
                         total_count = tasks.length
@@ -52,7 +51,6 @@
             if (priority == current_task_priority()) {
                 next_task()
             } else {
-                console.log('set priority', priority)
                 document.getElementById("task_priority_container").innerText = "" + priority
                 fetch(API + "/tasks/" + current_task_id(), {
                     method: "POST",
@@ -63,7 +61,6 @@
                     },
                     body: JSON.stringify({priority: priority})
                 }).then(function(response) {
-                    console.log('set priority response', response)
                     if (response.ok) {
                         next_task()
                     } else {
@@ -81,7 +78,6 @@
                     "X-Request-Id": Math.random()
                 }
             }).then(function(response) {
-                console.log('close response', response)
                 if (response.ok) {
                     total_count -= 1
                     setTotalTaskCount(total_count)
@@ -100,7 +96,6 @@
                     "X-Request-Id": Math.random()
                 }
             }).then(function(response) {
-                console.log('delete response', response)
                 if (response.ok) {
                     total_count -= 1
                     setTotalTaskCount(total_count)
