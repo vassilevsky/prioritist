@@ -9,6 +9,10 @@
         let total_count = null
         let current_task_index = -1
 
+        function restoreToken() {
+            document.getElementById("token_field").value = localStorage.getItem("token")
+        }
+
         function load_tasks() {
             token = document.getElementById("token_field").value
             fetch(API + "/tasks", {
@@ -17,6 +21,8 @@
                 }
             }).then(function(response) {
                 if (response.ok) {
+                    localStorage.setItem("token", token)
+
                     response.json().then(function(tasks) {
                         total_count = tasks.length
                         setTotalTaskCount(total_count)
@@ -154,7 +160,8 @@
         }
     </style>
 </head>
-<body>
+
+<body onload="restoreToken()">
     <center>
         <p id="token_form">
             Copy API token at the bottom of <a href="https://todoist.com/prefs/integrations" target="_blank">Integrations</a> page and paste it here:
