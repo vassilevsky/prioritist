@@ -29,10 +29,6 @@
             })
         }
 
-        function setTotalTaskCount(count) {
-            document.getElementById("total_tasks_count_container").innerText = "" + count
-        }
-
         function current_task_id() {
             return all_tasks[current_task_index].id
         }
@@ -51,7 +47,6 @@
             if (priority == current_task_priority()) {
                 next_task()
             } else {
-                document.getElementById("task_priority_container").innerText = "" + priority
                 fetch(API + "/tasks/" + current_task_id(), {
                     method: "POST",
                     headers: {
@@ -62,6 +57,7 @@
                     body: JSON.stringify({priority: priority})
                 }).then(function(response) {
                     if (response.ok) {
+                        setPriority(priority)
                         next_task()
                     } else {
                         console.log("set priority error")
@@ -118,10 +114,22 @@
                 //    "indent": 1,
                 //    "priority": 1,
                 //}
-                document.getElementById("task_number_container").innerText = "" + (current_task_index + 1)
-                document.getElementById("task_title_container").innerText = task.content
-                document.getElementById("task_priority_container").innerText = "" + task.priority
+                setText("task_number_container", current_task_index + 1)
+                setText("task_title_container", task.content)
+                setPriority(task.priority)
             }
+        }
+
+        function setTotalTaskCount(count) {
+            setText("total_tasks_count_container", count)
+        }
+
+        function setPriority(priority) {
+            setText("task_priority_container", priority)
+        }
+
+        function setText(element_id, number) {
+            document.getElementById(element_id).innerText = "" + number
         }
     </script>
 
