@@ -26,6 +26,7 @@
                     localStorage.setItem("token", token)
 
                     response.json().then(function(tasks) {
+                        document.getElementById("token_form").style.display = "none"
                         total_count = tasks.length
                         setTotalTaskCount(total_count)
                         all_tasks = tasks.sort(by_priority)
